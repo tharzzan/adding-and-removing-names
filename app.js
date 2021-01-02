@@ -1,16 +1,3 @@
-/**
- * My solution to Guil's challenge
- * - add validation
- *   * blank not allowed -- line 96
- *   * duplicate not allowed -- line 101
- *
- * - checkbox confirm label change -- line 135
- *
- * - If filter applied, confirm checkbox is hidden -- line 36
- *
- * - Save registrants in local storage -- line 189
- */
-
 const rsvpForm = document.querySelector('#registrar')
 const rsvpInputBox = rsvpForm.firstElementChild
 const mainDiv = document.querySelector('.main')
@@ -89,39 +76,45 @@ function createNewLi(newName) {
 
 rsvpForm.addEventListener('submit', (event) => {
     event.preventDefault()
-    
-    const pastRegistrants = getRegistrants()
     const newName = rsvpInputBox.value
 
-    if (newName === '') {
-        // if blank, then show error
-        alert(`Please input the person's name`)
-    }
-    else  {
+    /**
+     * Checks if userInput meet the criteria required:
+     * - can't input empty string
+     * - can't input duplicate entry
+     * @param {string} userInput
+     * @returns {boolean} TRUE if userInput meet requirement
+     */
+    function isInputMeetCriteria(userInput) {
+        // 1. check empty string
+        if (userInput === '') {
+            alert(`Please input the person's name`)
+            return false
+        }
+
+        // 2. check if duplicate
         const lis = ul.children
-        let isDuplicate = false
 
         for (let i = 0; i < lis.length; i++) {
-            const insertedName = lis[i].firstElementChild.textContent
+            const registeredName = lis[i].firstElementChild.textContent
 
-            if (newName.toLowerCase() === insertedName.toLowerCase()) {
-                isDuplicate = true
-                break
+            if (userInput.toLowerCase() === registeredName.toLowerCase()) {
+                alert('This person is already registered')
+                return false
             }
         }
 
-        if (isDuplicate) {
-            // error if duplicate
-            alert('This person is already registered')
-        }
-        else {
-            rsvpInputBox.value = '' // clear the input box
-        
-            const newLi = createNewLi(newName)
-            ul.appendChild(newLi)
+        // if it's all well, then...
+        return true
+    }
 
-            addRegistrants(newName)
-        }
+    if (isInputMeetCriteria(newName)) {
+        rsvpInputBox.value = '' // clear the input box
+
+        const newLi = createNewLi(newName)
+        ul.appendChild(newLi)
+
+        addRegistrants(newName)
     }
 })
 
